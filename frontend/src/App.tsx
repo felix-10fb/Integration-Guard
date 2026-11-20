@@ -162,15 +162,37 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  // Simulation Controls Handler
+  // Simulation Controls Handler with immediate optimistic and confirmed response updates
   const handleControl = useCallback((action: string, speed?: number, mode?: string, scenario?: string) => {
+    // Immediate optimistic local state update for snappy UI feedback
+    if (action === 'pause') {
+      setMetrics(prev => ({ ...prev, simulation_state: 'paused' }));
+    } else if (action === 'resume' || action === 'start') {
+      setMetrics(prev => ({ ...prev, simulation_state: 'running' }));
+    } else if (action === 'stop') {
+      setMetrics(prev => ({ ...prev, simulation_state: 'stopped' }));
+    } else if (action === 'set_speed' && speed !== undefined) {
+      setMetrics(prev => ({ ...prev, current_speed: speed }));
+    } else if (action === 'set_mode' && mode !== undefined) {
+      setMetrics(prev => ({ ...prev, simulation_mode: mode as any }));
+    }
+
     fetch('/api/simulation/control', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action, speed, mode, scenario })
     })
       .then(res => res.json())
-      .then(() => {
+      .then((data) => {
+        if (data && data.simulation_state) {
+          setMetrics(prev => ({
+            ...prev,
+            simulation_state: data.simulation_state,
+            current_speed: data.speed !== undefined ? data.speed : prev.current_speed,
+            simulation_mode: data.mode !== undefined ? data.mode : prev.simulation_mode,
+            auto_block_enabled: data.auto_block_enabled !== undefined ? data.auto_block_enabled : prev.auto_block_enabled
+          }));
+        }
         if (action === 'reset') {
           setEvents([]);
           setIncidents([]);
@@ -178,6 +200,25 @@ export const App: React.FC = () => {
         }
       })
       .catch(console.error);
+  }, []);
+
+  // Continuous fallback polling (2.0s) ensures meters and metrics stay lively even if WS reconnects
+  useEffect(() => {
+    const pollInterval = setInterval(() => {
+      fetch('/api/metrics')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.events_processed !== undefined) {
+            setMetrics(prev => ({
+              ...data,
+              simulation_state: data.simulation_state ?? prev.simulation_state
+            }));
+          }
+        })
+        .catch(() => {});
+    }, 2000);
+
+    return () => clearInterval(pollInterval);
   }, []);
 
   // Update Incident Status

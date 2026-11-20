@@ -166,11 +166,29 @@ export const MetricOperationsModal: React.FC<MetricOperationsModalProps> = ({
             </h5>
             <div className="flex flex-wrap gap-2">
               <button
-                onClick={() => { onControl(metrics.simulation_state === 'running' ? 'pause' : 'resume'); showFeedback(metrics.simulation_state === 'running' ? 'Simulation paused' : 'Simulation resumed in continuous loop'); }}
-                className="px-3 py-1.5 rounded-lg bg-graphite-850 hover:bg-graphite-750 text-xs font-mono font-semibold text-slate-200 border border-slate-700 flex items-center gap-1.5"
+                onClick={() => {
+                  const isRunning = metrics.simulation_state === 'running';
+                  onControl(isRunning ? 'pause' : 'resume');
+                  showFeedback(isRunning ? 'Simulation paused. Ingestion loop halted.' : 'Simulation resumed. Autonomous fluctuating injection loop active.');
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold border flex items-center gap-1.5 transition-all ${
+                  metrics.simulation_state === 'running'
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 hover:bg-amber-500/30 shadow-neon-amber/20'
+                    : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 hover:bg-emerald-500/30 shadow-neon-cyan/20 animate-pulse'
+                }`}
+                title="Toggle continuous background event loop"
               >
-                {metrics.simulation_state === 'running' ? <Pause className="w-3.5 h-3.5 text-amber-400" /> : <Play className="w-3.5 h-3.5 text-emerald-400" />}
-                <span>{metrics.simulation_state === 'running' ? 'Pause Telemetry Loop' : 'Resume Telemetry Loop'}</span>
+                {metrics.simulation_state === 'running' ? (
+                  <>
+                    <Pause className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Pause Telemetry Loop</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Resume Telemetry Loop</span>
+                  </>
+                )}
               </button>
 
               <button
@@ -723,12 +741,41 @@ export const MetricOperationsModal: React.FC<MetricOperationsModalProps> = ({
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Global Loop Pause/Resume Button in Dialog Header */}
+            <button
+              onClick={() => {
+                const nextAction = metrics.simulation_state === 'running' ? 'pause' : 'resume';
+                onControl(nextAction);
+                showFeedback(nextAction === 'pause' ? 'Simulation loop paused' : 'Simulation loop resumed in continuous loop');
+              }}
+              className={`px-2.5 py-1 rounded text-[11px] font-mono font-bold border flex items-center gap-1.5 transition-all ${
+                metrics.simulation_state === 'running'
+                  ? 'bg-amber-500/15 text-amber-300 border-amber-500/40 hover:bg-amber-500/25 shadow-neon-amber/20'
+                  : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/25 shadow-neon-cyan/20 animate-pulse'
+              }`}
+              title={metrics.simulation_state === 'running' ? 'Click to Pause Continuous Injection Loop' : 'Click to Resume Continuous Injection Loop'}
+            >
+              {metrics.simulation_state === 'running' ? (
+                <>
+                  <Pause className="w-3.5 h-3.5 text-amber-400" />
+                  <span>PAUSE LOOP</span>
+                </>
+              ) : (
+                <>
+                  <Play className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>RESUME LOOP</span>
+                </>
+              )}
+            </button>
+            <button
+              onClick={onClose}
+              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              title="Close Dialog"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Action Feedback Banner */}

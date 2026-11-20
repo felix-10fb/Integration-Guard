@@ -65,7 +65,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 await websocket.send_text("pong")
     except WebSocketDisconnect:
         simulator.disconnect(websocket)
-    except Exception:
+    except Exception as e:
         simulator.disconnect(websocket)
 
 @app.get("/api/health")

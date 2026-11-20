@@ -119,7 +119,7 @@ class EventSimulator:
             "type": "METRICS_UPDATE",
             "metrics": metrics.model_dump(),
             "incidents": [inc.model_dump() for inc in list(rules_engine.incidents.values())[-30:]],
-            "active_blocks": containment_service.get_audit_trail()[:10],
+            "active_blocks": [r.model_dump() for r in containment_service.get_audit_trail()[:10]],
             "time_buckets": self.get_time_ip_buckets()
         }
 
@@ -127,7 +127,8 @@ class EventSimulator:
         for conn in self.active_connections:
             try:
                 await conn.send_json(payload)
-            except Exception:
+            except Exception as e:
+                print(f"[WebSocket Error] Failed to send state to client: {e}")
                 dead_connections.add(conn)
         self.active_connections -= dead_connections
 
@@ -176,7 +177,8 @@ class EventSimulator:
         for conn in self.active_connections:
             try:
                 await conn.send_json(payload)
-            except Exception:
+            except Exception as e:
+                print(f"[WebSocket Error] Failed to send event to client: {e}")
                 dead_connections.add(conn)
         self.active_connections -= dead_connections
 

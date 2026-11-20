@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: integration-guard-db
+    environment:
+      POSTGRES_USER: guard
+      POSTGRES_PASSWORD: guardpassword
+      POSTGRES_DB: integration_guard
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U guard -d integration_guard"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: integration-guard-backend
+    environment:
+      - DATABASE_URL=postgresql://guard:guardpassword@db:5432/integration_guard
+      - HOST=0.0.0.0
+      - PORT=8000
+      - ZIP_EVIDENCE_PATH=/app/data/evidence.zip
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./backend:/app/backend
+      - "C:\\Users\\Joe Felix Arock J\\.gemini\\antigravity\\brain\\0a777fd3-7abf-4169-a7f3-586557d0526c\\.user_uploaded\\media_1795107035847_5c804074.zip:/app/data/evidence.zip:ro"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../Dockerfile.frontend
+    container_name: integration-guard-frontend
+    ports:
+      - "127.0.0.1:5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

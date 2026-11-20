@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #05070c;
+    color: #e2e8f0;
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: #080c14; }
+  ::-webkit-scrollbar-thumb { background: #1a2338; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #00f0ff88; }
+}
+
+/* ─── Panel Styles ─────────────────────────────────────────── */
+.panel-cyber {
+  background: linear-gradient(145deg, rgba(16,21,32,0.92) 0%, rgba(8,12,20,0.98) 100%);
+  border: 1px solid rgba(0,240,255,0.12);
+  box-shadow: 0 4px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
+  backdrop-filter: blur(16px);
+}
+
+.panel-cyber-alert {
+  background: linear-gradient(145deg, rgba(28,16,20,0.95) 0%, rgba(14,8,10,0.98) 100%);
+  border: 1px solid rgba(239,68,68,0.3);
+  box-shadow: 0 0 24px rgba(239,68,68,0.15), inset 0 1px 0 rgba(255,255,255,0.02);
+}
+
+.panel-glass {
+  background: rgba(10,15,25,0.7);
+  border: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+
+/* ─── Glow Effects ──────────────────────────────────────────── */
+.glow-cyan  { text-shadow: 0 0 10px rgba(0,240,255,0.7), 0 0 20px rgba(0,240,255,0.3); }
+.glow-red   { text-shadow: 0 0 10px rgba(239,68,68,0.7), 0 0 20px rgba(239,68,68,0.3); }
+.glow-amber { text-shadow: 0 0 10px rgba(245,158,11,0.7), 0 0 20px rgba(245,158,11,0.3); }
+.glow-violet{ text-shadow: 0 0 10px rgba(168,85,247,0.7), 0 0 20px rgba(168,85,247,0.3); }
+
+.border-glow-cyan   { box-shadow: 0 0 12px rgba(0,240,255,0.25), inset 0 0 12px rgba(0,240,255,0.04); }
+.border-glow-red    { box-shadow: 0 0 16px rgba(239,68,68,0.3),  inset 0 0 12px rgba(239,68,68,0.06); }
+.border-glow-amber  { box-shadow: 0 0 12px rgba(245,158,11,0.25),inset 0 0 12px rgba(245,158,11,0.04); }
+.border-glow-violet { box-shadow: 0 0 12px rgba(168,85,247,0.25),inset 0 0 12px rgba(168,85,247,0.04); }
+
+/* ─── Scanline / Grid Background ───────────────────────────── */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(0,240,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,240,255,0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.bg-scanline::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.05) 2px,
+    rgba(0,0,0,0.05) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Animated Border / Cyber Corners ──────────────────────── */
+.cyber-corner {
+  position: relative;
+}
+.cyber-corner::before,
+.cyber-corner::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-color: #00f0ff;
+  border-style: solid;
+}
+.cyber-corner::before {
+  top: -1px; left: -1px;
+  border-width: 2px 0 0 2px;
+}
+.cyber-corner::after {
+  bottom: -1px; right: -1px;
+  border-width: 0 2px 2px 0;
+}
+
+/* ─── Animated Gradient Header Border ─────────────────────── */
+@keyframes borderFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animated-border {
+  position: relative;
+}
+.animated-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #00f0ff, #0070f3, #a855f7, #ef4444, #00f0ff);
+  background-size: 300% 300%;
+  animation: borderFlow 4s ease infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ─── Event Strike Animations ──────────────────────────────── */
+@keyframes strikeFlashCyan {
+  0%   { background-color: rgba(0,240,255,0.22); box-shadow: inset 0 0 20px rgba(0,240,255,0.3); }
+  40%  { background-color: rgba(0,240,255,0.10); }
+  100% { background-color: transparent; box-shadow: none; }
+}
+
+@keyframes strikeFlashRed {
+  0%   { background-color: rgba(239,68,68,0.3); box-shadow: inset 0 0 24px rgba(239,68,68,0.5); }
+  40%  { background-color: rgba(239,68,68,0.14); }
+  100% { background-color: rgba(69,10,10,0.18); box-shadow: none; }
+}
+
+@keyframes strikeSlideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.event-strike-cyan {
+  animation: strikeFlashCyan 2s ease-out forwards, strikeSlideIn 0.3s ease-out;
+}
+
+.event-strike-red {
+  animation: strikeFlashRed 2.5s ease-out forwards, strikeSlideIn 0.3s ease-out;
+}
+
+/* ─── Metric Card Hover Lift ───────────────────────────────── */
+.metric-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 16px rgba(0,240,255,0.1);
+}
+
+/* ─── Pulse / Heartbeat ────────────────────────────────────── */
+@keyframes pulse-fast {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.95); }
+}
+
+@keyframes neonPulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(0,240,255,0.5); }
+  50%       { box-shadow: 0 0 18px rgba(0,240,255,0.9), 0 0 32px rgba(0,240,255,0.4); }
+}
+
+.animate-heartbeat { animation: pulse-fast 1.4s cubic-bezier(0.4,0,0.6,1) infinite; }
+.animate-neon-pulse { animation: neonPulse 2s ease-in-out infinite; }
+
+/* ─── Radar Ring ───────────────────────────────────────────── */
+@keyframes radarPing {
+  0%   { transform: scale(0.9);  opacity: 0.9; }
+  50%  { transform: scale(1.5);  opacity: 0.3; }
+  100% { transform: scale(2.0);  opacity: 0;   }
+}
+.animate-radar { animation: radarPing 1.8s cubic-bezier(0,0,0.2,1) infinite; }
+
+/* ─── Slide-In from Top ─────────────────────────────────────── */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-down { animation: slideDown 0.35s ease-out forwards; }
+
+/* ─── Number Count-Up Flash ─────────────────────────────────── */
+@keyframes numFlash {
+  0%   { color: #00f0ff; }
+  100% { color: inherit; }
+}
+.num-flash { animation: numFlash 0.6s ease-out; }
+
+/* ─── Progress Bar Shimmer ──────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(0,240,255,0.15) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* ─── Alert Badge Blink ─────────────────────────────────────── */
+@keyframes criticalBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+.critical-blink { animation: criticalBlink 0.9s ease-in-out infinite; }
+
+/* ─── Typewriter cursor ─────────────────────────────────────── */
+@keyframes blink-caret {
+  0%, 100% { border-color: transparent; }
+  50%       { border-color: #00f0ff; }
+}
+.type-cursor {
+  border-right: 2px solid #00f0ff;
+  animation: blink-caret 1s step-end infinite;
+}
+
+/* ─── Tooltip ───────────────────────────────────────────────── */
+.tooltip-cyber {
+  background: #0b0f17;
+  border: 1px solid rgba(0,240,255,0.3);
+  color: #e2e8f0;
+  font-family: monospace;
+  font-size: 11px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6), 0 0 12px rgba(0,240,255,0.1);
+}
